@@ -57,7 +57,6 @@
       <label for="password">Password</label>
       <input type="password" id="password" placeholder="••••••••">
 
-      <!-- Only shows if they are signing up -->
       <div id="name-field" style="display:none;">
         <label for="nickname">Nickname</label>
         <input type="text" id="nickname" placeholder="e.g. Nova">
@@ -93,7 +92,6 @@
   const togglePrompt = document.getElementById('toggle-prompt');
   const toggleLink = document.getElementById('toggle-link');
 
-  // Toggle between Log In and Sign Up
   toggleLink.addEventListener('click', () => {
     isSignUp = !isSignUp;
     err.style.display = 'none';
@@ -113,7 +111,6 @@
     }
   });
 
-  // Handle the button click
   btn.addEventListener('click', async () => {
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
@@ -127,41 +124,37 @@
     btn.textContent = 'Checking...';
     err.style.display = 'none';
 
-    if (isSignUp) {
-      // --- SIGN UP FLOW ---
-      const { data, error } = await supabase.auth.signUp({
-        email: email,
-        password: password,
-      });
+    try {
+      if (isSignUp) {
+        const { data, error } = await supabase.auth.signUp({
+          email: email,
+          password: password,
+        });
 
-      if (error) {
-        err.textContent = error.message;
-        err.style.display = 'block';
-        btn.textContent = 'Sign Up';
-      } else {
-        // If email confirmation is off, they are logged in immediately
+        if (error) throw error;
+
         if (data.session) {
            window.location.href = 'confessions.html';
         } else {
-           // If Supabase requires them to confirm email (even if you turned it off, some settings override)
            alert("Account created! You can now log in.");
-           toggleLink.click(); // Switch back to login mode
+           toggleLink.click();
+           btn.textContent = 'Enter';
         }
-      }
-    } else {
-      // --- LOG IN FLOW ---
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: email,
-        password: password,
-      });
-
-      if (error) {
-        err.textContent = error.message;
-        err.style.display = 'block';
-        btn.textContent = 'Enter';
       } else {
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: email,
+          password: password,
+        });
+
+        if (error) throw error;
+
         window.location.href = 'confessions.html';
       }
+    } catch (error) {
+      // This will now catch ANY error and show it to you
+      err.textContent = error.message || "Connection failed. Check console.";
+      err.style.display = 'block';
+      btn.textContent = isSignUp ? 'Sign Up' : 'Enter';
     }
   });
 </script>
