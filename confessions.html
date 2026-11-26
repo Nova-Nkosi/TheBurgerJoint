@@ -86,69 +86,82 @@
 
 <script src="assets/nav.js"></script>
 
-<!-- Load Supabase Library -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- Load Supabase Library from unpkg -->
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 <script>
-  const supabaseUrl = 'https://yssyfxwvcdmqlulqsiem.supabase.co';
-  const supabaseKey = 'sb_publishable_vEBQ5ObCGj5yotPFao4CXw_mqnQyVSf';
-  const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+  var supabaseUrl = 'https://yssyfxwvcdmqlulqsiem.supabase.co';
+  var supabaseKey = 'sb_publishable_vEBQ5ObCGj5yotPFao4CXw_mqnQyVSf';
+  var client = window.supabase.createClient(supabaseUrl, supabaseKey);
 
   // --- 1. CHECK IF LOGGED IN ---
   async function checkUser() {
-    const { data: { session } } = await supabase.auth.getSession();
-    
-    if (!session) {
-      // If no session, kick them back to the login page
-      window.location.href = 'login.html';
-    } else {
-      // They are logged in, show the page!
-      document.getElementById('loading').style.display = 'none';
-      document.getElementById('confessions-area').style.display = 'block';
-      loadConfessions();
+    try {
+      var { data, error } = await client.auth.getUser();
+      
+      if (error || !data.user) {
+        // If no user, kick them back to login
+        window.location.href = 'login.html';
+      } else {
+        // They are logged in, show the page!
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('confessions-area').style.display = 'block';
+        loadConfessions();
+      }
+    } catch (err) {
+      document.getElementById('loading').innerHTML = '<span style="color:red;">Error: ' + err.message + '</span>';
     }
   }
 
   // --- 2. LOAD CONFESSIONS ---
   async function loadConfessions() {
-    const { data, error } = await supabase
+    var { data, error } = await client
       .from('confessions')
       .select('*')
       .order('created_at', { ascending: false });
 
-    const list = document.getElementById('list-area');
+    var list = document.getElementById('list-area');
     
     if (error) {
-      list.innerHTML = `<p style="color:red;">Error loading: ${error.message}</p>`;
+      list.innerHTML = '<p style="color:red;">Error loading: ' + error.message + '</p>';
       return;
     }
 
     if (data.length === 0) {
-      list.innerHTML = `<p style="font-style:italic; color:var(--ash);">No secrets yet. Be the first.</p>`;
+      list.innerHTML = '<p style="font-style:italic; color:var(--ash);">No secrets yet. Be the first.</p>';
       return;
     }
 
-    list.innerHTML = data.map(item => `
-      <div class="confession-card">
-        <div class="confession-date">${new Date(item.created_at).toLocaleDateString()}</div>
-        <p>${item.content}</p>
-      </div>
-    `).join('');
+    var htmlString = '';
+    for (var i = 0; i < data.length; i++) {
+      var item = data[i];
+      var dateStr = new Date(item.created_at).toLocaleDateString();
+      htmlString += '<div class="confession-card">';
+      htmlString += '<div class="confession-date">' + dateStr + '</div>';
+      htmlString += '<p>' + item.content + '</p>';
+      htmlString += '</div>';
+    }
+    list.innerHTML = htmlString;
   }
 
   // --- 3. POST A NEW CONFESSION ---
   document.getElementById('submit-btn').addEventListener('click', async () => {
-    const text = document.getElementById('new-confession').value;
+    var text = document.getElementById('new-confession').value;
     if (!text) return;
 
-    const btn = document.getElementById('submit-btn');
+    var btn = document.getElementById('submit-btn');
     btn.textContent = 'Posting...';
 
-    const { data: { user } } = await supabase.auth.getUser();
+    var userResponse = await client.auth.getUser();
+    if (!userResponse.data.user) {
+      alert("You got logged out. Please log in again.");
+      window.location.href = 'login.html';
+      return;
+    }
 
-    const { error } = await supabase
+    var { error } = await client
       .from('confessions')
       .insert([
-        { content: text, user_id: user.id }
+        { content: text, user_id: userResponse.data.user.id }
       ]);
 
     if (error) {
@@ -163,7 +176,7 @@
 
   // --- 4. LOG OUT ---
   document.getElementById('logout-btn').addEventListener('click', async () => {
-    await supabase.auth.signOut();
+    await client.auth.signOut();
     window.location.href = 'login.html';
   });
 
