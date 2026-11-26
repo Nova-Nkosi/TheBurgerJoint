@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Staff Only · Charlie's</title>
+<link rel="stylesheet" href="assets/style.css">
+<style>
+  /* A little extra styling just for the login box */
+  .login-box {
+    max-width: 400px; margin: 40px auto; background: #FBF7F0;
+    border: 1px dashed var(--latte); border-radius: 10px; padding: 28px;
+  }
+  .error-msg { color: #a33; font-size: 0.85rem; margin-bottom: 10px; display: none; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap">
+    <a class="brand" href="index.html">Charlie's</a>
+    <button class="hamburger" aria-label="Open menu" aria-expanded="false" aria-controls="overlay">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</div>
+
+<nav class="overlay" id="overlay" aria-label="Main menu">
+  <a href="index.html">Home</a>
+  <a href="what-is.html">What is Charlie's Burger Joint?</a>
+  <a href="members.html">Member List</a>
+  <a href="profiles.html">Member Profiles</a>
+  <a href="calendar.html">Group Calendar</a>
+  <a href="locations.html">Locations</a>
+  <a href="contact.html">Contact Us</a>
+</nav>
+
+<header class="page-head">
+  <p class="kicker">Private Area</p>
+  <h1>Staff Only</h1>
+  <p class="lead" style="margin:16px auto 0;">Log in to see the secret menu.</p>
+</header>
+
+<main>
+  <div class="wrap">
+    <div class="login-box">
+      <h3 style="font-weight:normal; margin-bottom:18px;">Log In</h3>
+      <p id="error-msg" class="error-msg"></p>
+      
+      <label for="email">Email</label>
+      <input type="email" id="email" placeholder="you@example.com">
+
+      <label for="password">Password</label>
+      <input type="password" id="password" placeholder="••••••••">
+
+      <button type="button" id="login-btn" style="width:100%; margin-top:10px;">Enter</button>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap"><p>Charlie's Burger Joint · eMzansi · Built with love and no photos</p></div>
+</footer>
+
+<script src="assets/nav.js"></script>
+
+<!-- Load Supabase Library -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  // Initialize Supabase with your keys
+  const supabaseUrl = 'https://yssyfxwvcdmqlulqsiem.supabase.co';
+  const supabaseKey = 'sb_publishable_vEBQ5ObCGj5yotPFao4CXw_mqnQyVSf';
+  const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+  const btn = document.getElementById('login-btn');
+  const err = document.getElementById('error-msg');
+
+  btn.addEventListener('click', async () => {
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    
+    btn.textContent = 'Checking...';
+    err.style.display = 'none';
+
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: email,
+      password: password,
+    });
+
+    if (error) {
+      err.textContent = error.message;
+      err.style.display = 'block';
+      btn.textContent = 'Enter';
+    } else {
+      // Success! Send them to the confessions page
+      window.location.href = 'confessions.html';
+    }
+  });
+</script>
+</body>
+</html>
