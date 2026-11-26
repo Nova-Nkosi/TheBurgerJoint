@@ -5,72 +5,162 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Staff Only · Charlie's</title>
 <link rel="stylesheet" href="assets/style.css">
+<style>
+  .login-box {
+    max-width: 400px; margin: 40px auto; background: #FBF7F0;
+    border: 1px dashed var(--latte); border-radius: 10px; padding: 28px;
+  }
+  .error-msg { color: #a33; font-size: 0.85rem; margin-bottom: 10px; display: none; }
+  .toggle-text { 
+    text-align: center; font-size: 0.85rem; margin-top: 16px; 
+    font-family: 'Courier New', monospace; color: var(--cocoa); 
+  }
+  .toggle-text a { color: var(--espresso); cursor: pointer; text-decoration: underline; }
+</style>
 </head>
 <body>
 
 <div class="topbar">
   <div class="wrap">
     <a class="brand" href="index.html">Charlie's</a>
+    <button class="hamburger" aria-label="Open menu" aria-expanded="false" aria-controls="overlay">
+      <span></span><span></span><span></span>
+    </button>
   </div>
 </div>
 
-<main style="padding-top: 100px;">
-  <div class="wrap" style="max-width: 400px;">
-    <h2 style="text-align: center; margin-bottom: 20px;">Staff Login</h2>
-    
-    <div style="background: #FBF7F0; border: 1px dashed var(--latte); padding: 20px; border-radius: 10px;">
-      <label>Email</label>
-      <input type="email" id="email" style="width:100%; padding:10px; margin-bottom:15px;">
+<nav class="overlay" id="overlay" aria-label="Main menu">
+  <a href="index.html">Home</a>
+  <a href="what-is.html">What is Charlie's Burger Joint?</a>
+  <a href="members.html">Member List</a>
+  <a href="profiles.html">Member Profiles</a>
+  <a href="calendar.html">Group Calendar</a>
+  <a href="locations.html">Locations</a>
+  <a href="contact.html">Contact Us</a>
+</nav>
+
+<header class="page-head">
+  <p class="kicker">Private Area</p>
+  <h1>Staff Only</h1>
+  <p class="lead" style="margin:16px auto 0;">Log in to see the secret menu.</p>
+</header>
+
+<main>
+  <div class="wrap">
+    <div class="login-box">
+      <h3 id="form-title" style="font-weight:normal; margin-bottom:18px;">Log In</h3>
+      <p id="error-msg" class="error-msg"></p>
       
-      <label>Password</label>
-      <input type="password" id="password" style="width:100%; padding:10px; margin-bottom:15px;">
+      <label for="email">Email</label>
+      <input type="email" id="email" placeholder="you@example.com">
+
+      <label for="password">Password</label>
+      <input type="password" id="password" placeholder="••••••••">
+
+      <!-- Nickname field (only shows during sign up) -->
+      <div id="name-field" style="display:none;">
+        <label for="nickname">Nickname</label>
+        <input type="text" id="nickname" placeholder="e.g. Nova">
+      </div>
+
+      <button type="button" id="action-btn" style="width:100%; margin-top:10px;">Enter</button>
       
-      <button type="button" onclick="doLogin()" style="width:100%; padding:12px; background:var(--cocoa); color:white; border:none; border-radius:5px;">Log In</button>
-      
-      <p id="msg" style="color: red; text-align: center; margin-top: 15px; font-size: 14px;"></p>
+      <p class="toggle-text">
+        <span id="toggle-prompt">Need an account?</span> 
+        <a id="toggle-link">Sign up here</a>
+      </p>
     </div>
   </div>
 </main>
 
-<!-- Load Supabase from unpkg instead of jsdelivr just in case -->
-<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<footer>
+  <div class="wrap"><p>Charlie's Burger Joint · eMzansi · Built with love and no photos</p></div>
+</footer>
 
+<script src="assets/nav.js"></script>
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 <script>
-  // 1. Setup Supabase
-  const supabaseUrl = 'https://yssyfxwvcdmqlulqsiem.supabase.co';
-  const supabaseKey = 'sb_publishable_vEBQ5ObCGj5yotPFao4CXw_mqnQyVSf';
-  
-  // We use "var" instead of "const" here to prevent strict-mode errors on old phones
+  var supabaseUrl = 'https://yssyfxwvcdmqlulqsiem.supabase.co';
+  var supabaseKey = 'sb_publishable_vEBQ5ObCGj5yotPFao4CXw_mqnQyVSf';
   var client = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-  // 2. The Login Function
-  async function doLogin() {
+  var isSignUp = false;
+  
+  var btn = document.getElementById('action-btn');
+  var err = document.getElementById('error-msg');
+  var formTitle = document.getElementById('form-title');
+  var nameField = document.getElementById('name-field');
+  var togglePrompt = document.getElementById('toggle-prompt');
+  var toggleLink = document.getElementById('toggle-link');
+
+  // Toggle between Log In and Sign Up
+  toggleLink.addEventListener('click', function() {
+    isSignUp = !isSignUp;
+    err.style.display = 'none';
+    
+    if (isSignUp) {
+      formTitle.textContent = 'Create Account';
+      nameField.style.display = 'block';
+      btn.textContent = 'Sign Up';
+      togglePrompt.textContent = 'Already have an account?';
+      toggleLink.textContent = 'Log in here';
+    } else {
+      formTitle.textContent = 'Log In';
+      nameField.style.display = 'none';
+      btn.textContent = 'Enter';
+      togglePrompt.textContent = 'Need an account?';
+      toggleLink.textContent = 'Sign up here';
+    }
+  });
+
+  // Handle the button click
+  btn.addEventListener('click', async function() {
     var email = document.getElementById('email').value;
     var password = document.getElementById('password').value;
-    var msg = document.getElementById('msg');
+    
+    if (!email || !password) {
+      err.textContent = 'Please enter both email and password.';
+      err.style.display = 'block';
+      return;
+    }
 
-    msg.textContent = "Connecting to Supabase..."; 
-    msg.style.color = "black";
+    btn.textContent = 'Checking...';
+    err.style.display = 'none';
 
     try {
-      var response = await client.auth.signInWithPassword({
-        email: email,
-        password: password
-      });
+      if (isSignUp) {
+        // --- SIGN UP FLOW ---
+        var { data, error } = await client.auth.signUp({
+          email: email,
+          password: password,
+        });
 
-      if (response.error) {
-        msg.textContent = response.error.message;
-        msg.style.color = "red";
+        if (error) throw error;
+
+        if (data.session) {
+           window.location.href = 'confessions.html';
+        } else {
+           alert("Account created! You can now log in.");
+           toggleLink.click(); // Switch back to login mode
+           btn.textContent = 'Enter';
+        }
       } else {
-        msg.textContent = "Success! Redirecting...";
-        msg.style.color = "green";
+        // --- LOG IN FLOW ---
+        var { data, error } = await client.auth.signInWithPassword({
+          email: email,
+          password: password,
+        });
+
+        if (error) throw error;
+
         window.location.href = 'confessions.html';
       }
-    } catch (err) {
-      msg.textContent = "System Error: " + err.message;
-      msg.style.color = "red";
+    } catch (error) {
+      err.textContent = error.message || "Connection failed.";
+      err.style.display = 'block';
+      btn.textContent = isSignUp ? 'Sign Up' : 'Enter';
     }
-  }
+  });
 </script>
 </body>
 </html>
