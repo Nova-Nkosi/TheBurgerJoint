@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wall of Memories &middot; Charlie's</title>
+    <link rel="stylesheet" href="assets/style.css">
+    <style>
+        /* Countdown Styles */
+        .countdown-container {
+            text-align: center;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 40px 20px;
+            margin-bottom: 60px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .countdown-title {
+            font-family: var(--font-body);
+            font-size: 0.9rem;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+        }
+        .countdown-name {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--accent-gold);
+            margin-bottom: 24px;
+        }
+        .timer {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        .timer-block {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .timer-num {
+            font-family: var(--font-display);
+            font-size: clamp(2.5rem, 8vw, 4rem);
+            font-weight: 800;
+            color: var(--text-primary);
+            line-height: 1;
+        }
+        .timer-label {
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            letter-spacing: 0.1em;
+            margin-top: 8px;
+        }
+
+        /* Polaroid Gallery Styles */
+        .memory-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 24px;
+            margin-top: 40px;
+        }
+        .polaroid {
+            background: #FBF7F0;
+            padding: 12px 12px 20px 12px;
+            border-radius: 4px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+            transition: transform 0.3s ease;
+        }
+        .polaroid:hover {
+            transform: scale(1.03) rotate(1deg);
+            z-index: 10;
+            position: relative;
+        }
+        .polaroid img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 2px;
+            margin-bottom: 12px;
+            background: #ccc;
+        }
+        .polaroid-title {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.9rem;
+            color: #333;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        /* Upload Form Box */
+        .upload-box {
+            background: var(--bg-surface);
+            border: 1px dashed var(--border-color);
+            border-radius: 12px;
+            padding: 32px;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Ambient Background Orbs -->
+    <div class="bg-orbs" aria-hidden="true">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
+    <!-- Top Navigation -->
+    <div class="topbar">
+        <div class="wrap">
+            <a class="brand" href="index.html">Charlie's</a>
+            <button class="hamburger" aria-label="Open menu" aria-expanded="false" aria-controls="overlay">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Overlay Menu -->
+    <nav class="overlay" id="overlay" aria-label="Main menu">
+        <a href="index.html">Home</a>
+        <a href="what-is.html">What is Charlie's Burger Joint?</a>
+        <a href="members.html">Member List</a>
+        <a href="profiles.html">Member Profiles</a>
+        <a href="calendar.html">Group Calendar</a>
+        <a href="memories.html" class="active">Wall of Memories</a>
+        <a href="locations.html">Locations</a>
+        <a href="contact.html">Contact Us</a>
+    </nav>
+
+    <!-- Page Header -->
+    <header class="page-head">
+        <p class="kicker">The Living Room</p>
+        <h1>Wall of Memories</h1>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <div class="wrap">
+
+            <!-- The Huge Countdown -->
+            <div class="countdown-container">
+                <p class="countdown-title">Countdown to the next birthday</p>
+                <p class="countdown-name" id="next-bday-name">Calculating...</p>
+                <div class="timer" id="timer">
+                    <div class="timer-block"><span class="timer-num" id="days">00</span><span class="timer-label">Days</span></div>
+                    <div class="timer-block"><span class="timer-num" id="hours">00</span><span class="timer-label">Hours</span></div>
+                    <div class="timer-block"><span class="timer-num" id="mins">00</span><span class="timer-label">Mins</span></div>
+                    <div class="timer-block"><span class="timer-num" id="secs">00</span><span class="timer-label">Secs</span></div>
+                </div>
+            </div>
+
+            <!-- Gallery -->
+            <h2 style="margin-bottom: 20px;">The Polaroids</h2>
+            <div id="loading-memories" style="font-style: italic; color: var(--text-secondary);">Loading memories...</div>
+            <div class="memory-grid" id="memory-grid">
+                <!-- JavaScript will fill this -->
+            </div>
+
+            <!-- Upload Form (Only shows if logged in) -->
+            <div class="upload-box" id="upload-box" style="display: none;">
+                <h3 style="font-family: var(--font-display); margin-bottom: 16px;">Pin a new memory</h3>
+                <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 20px;">You must be logged in to post.</p>
+                
+                <label>Caption (e.g., "That time in Durban")</label>
+                <input type="text" id="memory-title" placeholder="What's the story?">
+
+                <label>Choose Image</label>
+                <input type="file" id="memory-image" accept="image/*" style="background: transparent; border: none; padding-left: 0;">
+
+                <button type="button" id="upload-btn" style="margin-top: 16px;">Pin to the Wall</button>
+                <p id="upload-msg" style="margin-top: 12px; font-size: 0.85rem; color: var(--accent-gold);"></p>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="wrap">
+            <p>Developed by Nova, 2026</p>
+        </div>
+    </footer>
+
+    <script src="assets/nav.js"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script>
+        var supabaseUrl = 'https://yssyfxwvcdmqlulqsiem.supabase.co';
+        var supabaseKey = 'sb_publishable_vEBQ5ObCGj5yotPFao4CXw_mqnQyVSf';
+        var client = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        // --- 1. COUNTDOWN LOGIC ---
+        // We store birthdays as [Month, Day]. Note: Months start at 0 (Jan = 0, Feb = 1, etc.)
+        var birthdays = [
+            { name: 'Beetroot', month: 0, day: 7 },
+            { name: 'Sbosh', month: 0, day: 29 },
+            { name: 'Max', month: 2, day: 3 },
+            { name: 'Buhle', month: 6, day: 18 },
+            { name: 'Siphamandla', month: 8, day: 11 },
+            { name: 'Dio', month: 8, day: 14 },
+            { name: 'Kiki', month: 8, day: 16 },
+            { name: 'Lebo', month: 10, day: 9 },
+            { name: 'Nova', month: 10, day: 11 }
+        ];
+
+        function updateCountdown() {
+            var now = new Date();
+            var currentYear = now.getFullYear();
+            var nextBday = null;
+            var closestDiff = Infinity;
+            var nextName = "";
+
+            for (var i = 0; i < birthdays.length; i++) {
+                var b = birthdays[i];
+                var bdayDate = new Date(currentYear, b.month, b.day, 0, 0, 0);
+                
+                // If the birthday already passed this year, check next year
+                if (bdayDate < now) {
+                    bdayDate = new Date(currentYear + 1, b.month, b.day, 0, 0, 0);
+                }
+
+                var diff = bdayDate - now;
+                if (diff < closestDiff) {
+                    closestDiff = diff;
+                    nextBday = bdayDate;
+                    nextName = b.name;
+                }
+            }
+
+            // Time calculations
+            var days = Math.floor(closestDiff / (1000 * 60 * 60 * 24));
+            var hours = Math.floor((closestDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            var mins = Math.floor((closestDiff % (1000 * 60 * 60)) / (1000 * 60));
+            var secs = Math.floor((closestDiff % (1000 * 60)) / 1000);
+
+            // Update DOM
+            document.getElementById('next-bday-name').innerText = nextName + "'s Birthday";
+            document.getElementById('days').innerText = days < 10 ? '0' + days : days;
+            document.getElementById('hours').innerText = hours < 10 ? '0' + hours : hours;
+            document.getElementById('mins').innerText = mins < 10 ? '0' + mins : mins;
+            document.getElementById('secs').innerText = secs < 10 ? '0' + secs : secs;
+        }
+
+        // Run immediately, then every 1 second
+        updateCountdown();
+        setInterval(updateCountdown, 1000);
+
+
+        // --- 2. LOAD MEMORIES ---
+        async function loadMemories() {
+            var { data, error } = await client
+                .from('memories')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            var grid = document.getElementById('memory-grid');
+            document.getElementById('loading-memories').style.display = 'none';
+
+            if (error) {
+                grid.innerHTML = '<p style="color: var(--accent-brand);">Error loading: ' + error.message + '</p>';
+                return;
+            }
+
+            if (data.length === 0) {
+                grid.innerHTML = '<p style="font-style: italic; color: var(--text-secondary);">No memories pinned yet.</p>';
+                return;
+            }
+
+            var htmlString = '';
+            for (var i = 0; i < data.length; i++) {
+                var item = data[i];
+                htmlString += '<div class="polaroid">';
+                htmlString += '<img src="' + item.image_url + '" alt="' + item.title + '">';
+                htmlString += '<p class="polaroid-title">' + item.title + '</p>';
+                htmlString += '</div>';
+            }
+            grid.innerHTML = htmlString;
+        }
+
+        // --- 3. CHECK AUTH & ENABLE UPLOAD ---
+        async function checkAuthForUpload() {
+            var { data } = await client.auth.getUser();
+            if (data.user) {
+                document.getElementById('upload-box').style.display = 'block';
+            }
+            loadMemories();
+        }
+
+        // --- 4. HANDLE IMAGE UPLOAD ---
+        document.getElementById('upload-btn').addEventListener('click', async () => {
+            var title = document.getElementById('memory-title').value;
+            var fileInput = document.getElementById('memory-image');
+            var file = fileInput.files[0];
+            var msg = document.getElementById('upload-msg');
+            var btn = document.getElementById('upload-btn');
+
+            if (!title || !file) {
+                msg.style.color = 'var(--accent-brand)';
+                msg.innerText = 'Please provide a caption and choose an image.';
+                return;
+            }
+
+            btn.innerText = 'Uploading...';
+            msg.innerText = '';
+
+            // 1. Upload image to Supabase Storage
+            var fileExt = file.name.split('.').pop();
+            var fileName = Date.now() + '.' + fileExt;
+
+            var { data: uploadData, error: uploadError } = await client.storage
+                .from('photos')
+                .upload(fileName, file);
+
+            if (uploadError) {
+                msg.style.color = 'var(--accent-brand)';
+                msg.innerText = 'Upload failed: ' + uploadError.message;
+                btn.innerText = 'Pin to the Wall';
+                return;
+            }
+
+            // 2. Get the public URL of the uploaded image
+            var { data: urlData } = client.storage
+                .from('photos')
+                .getPublicUrl(fileName);
+
+            // 3. Save the title and URL to the database
+            var { error: dbError } = await client
+                .from('memories')
+                .insert([
+                    { title: title, image_url: urlData.publicUrl }
+                ]);
+
+            if (dbError) {
+                msg.style.color = 'var(--accent-brand)';
+                msg.innerText = 'Database error: ' + dbError.message;
+            } else {
+                msg.style.color = 'var(--accent-gold)';
+                msg.innerText = 'Memory pinned successfully!';
+                document.getElementById('memory-title').value = '';
+                fileInput.value = '';
+                loadMemories(); // Refresh the gallery
+            }
+            btn.innerText = 'Pin to the Wall';
+        });
+
+        // Initialize
+        checkAuthForUpload();
+
+    </script>
+</body>
+</html>
