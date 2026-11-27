@@ -6,204 +6,99 @@
     <title>Staff Only &middot; Charlie's</title>
     <link rel="stylesheet" href="assets/style.css">
     <style>
-        /* Local styles to keep the login box centered and styled */
-        .login-container {
-            max-width: 420px;
-            margin: 40px auto;
-            background: var(--bg-surface);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 32px;
-        }
-        .login-container h3 {
-            font-family: var(--font-display);
-            font-size: 1.4rem;
-            font-weight: 700;
-            margin-bottom: 24px;
-            color: var(--text-primary);
-        }
-        .error-msg {
-            display: none;
-            color: #E35D41;
-            font-size: 0.85rem;
-            margin-bottom: 16px;
-            text-align: center;
-        }
-        .toggle-text {
-            text-align: center;
-            font-size: 0.85rem;
-            margin-top: 24px;
-            color: var(--text-secondary);
-            font-family: var(--font-body);
-        }
-        .toggle-text a {
-            color: var(--accent-gold);
-            cursor: pointer;
-            text-decoration: underline;
-            text-underline-offset: 4px;
-            transition: color 0.2s ease;
-        }
-        .toggle-text a:hover {
-            color: var(--accent-brand);
-        }
+        .login-container { max-width: 420px; margin: 40px auto; background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 12px; padding: 32px; }
+        .login-container h3 { font-family: var(--font-display); font-size: 1.4rem; font-weight: 700; margin-bottom: 24px; color: var(--text-primary); }
+        .error-msg { display: none; color: #E35D41; font-size: 0.85rem; margin-bottom: 16px; text-align: center; }
+        .toggle-text { text-align: center; font-size: 0.85rem; margin-top: 24px; color: var(--text-secondary); font-family: var(--font-body); }
+        .toggle-text a { color: var(--accent-gold); cursor: pointer; text-decoration: underline; text-underline-offset: 4px; transition: color 0.2s ease; }
+        .toggle-text a:hover { color: var(--accent-brand); }
     </style>
 </head>
 <body>
-
-    <!-- Ambient Background Orbs -->
     <div class="bg-orbs" aria-hidden="true">
-        <div class="orb orb-1"></div>
-        <div class="orb orb-2"></div>
-        <div class="orb orb-3"></div>
+        <div class="orb orb-1"></div><div class="orb orb-2"></div><div class="orb orb-3"></div>
     </div>
-
-    <!-- Top Navigation -->
     <div class="topbar">
         <div class="wrap">
             <a class="brand" href="index.html">Charlie's</a>
-            <button class="hamburger" aria-label="Open menu" aria-expanded="false" aria-controls="overlay">
-                <span></span><span></span><span></span>
-            </button>
+            <button class="hamburger" aria-label="Open menu" aria-expanded="false" aria-controls="overlay"><span></span><span></span><span></span></button>
         </div>
     </div>
-
-    <!-- Overlay Menu -->
     <nav class="overlay" id="overlay" aria-label="Main menu">
         <a href="index.html">Home</a>
         <a href="what-is.html">What is Charlie's Burger Joint?</a>
         <a href="members.html">Member List</a>
         <a href="profiles.html">Member Profiles</a>
         <a href="calendar.html">Group Calendar</a>
+        <a href="memories.html">Wall of Memories</a>
         <a href="locations.html">Locations</a>
         <a href="contact.html">Contact Us</a>
     </nav>
-
-    <!-- Page Header -->
     <header class="page-head">
         <p class="kicker">Private Area</p>
         <h1>Staff Only</h1>
         <p class="lead" style="margin: 16px auto 0;">Log in to see the secret menu.</p>
     </header>
-
-    <!-- Main Content -->
     <main>
         <div class="wrap">
             <div class="login-container">
                 <h3 id="form-title">Log In</h3>
                 <p id="error-msg" class="error-msg"></p>
-                
                 <form onsubmit="event.preventDefault();">
                     <label for="email">Email</label>
                     <input type="email" id="email" placeholder="you@example.com" required>
-
                     <label for="password">Password</label>
                     <input type="password" id="password" placeholder="••••••••" required>
-
                     <div id="name-field" style="display: none;">
                         <label for="nickname">Nickname</label>
                         <input type="text" id="nickname" placeholder="e.g. Nova">
                     </div>
-
                     <button type="button" id="action-btn" style="margin-top: 8px;">Enter</button>
                 </form>
-                
-                <p class="toggle-text">
-                    <span id="toggle-prompt">Need an account?</span> 
-                    <a id="toggle-link">Sign up here</a>
-                </p>
+                <p class="toggle-text"><span id="toggle-prompt">Need an account?</span> <a id="toggle-link">Sign up here</a></p>
             </div>
         </div>
     </main>
-
-    <!-- Footer -->
-    <footer>
-        <div class="wrap">
-            <p>Developed by Nova, 2026</p>
-        </div>
-    </footer>
-
+    <footer><div class="wrap"><p>Developed by Nova, 2026</p></div></footer>
     <script src="assets/nav.js"></script>
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <script>
         var supabaseUrl = 'https://yssyfxwvcdmqlulqsiem.supabase.co';
         var supabaseKey = 'sb_publishable_vEBQ5ObCGj5yotPFao4CXw_mqnQyVSf';
         var client = window.supabase.createClient(supabaseUrl, supabaseKey);
-
         var isSignUp = false;
-        
         var btn = document.getElementById('action-btn');
         var err = document.getElementById('error-msg');
         var formTitle = document.getElementById('form-title');
         var nameField = document.getElementById('name-field');
         var togglePrompt = document.getElementById('toggle-prompt');
         var toggleLink = document.getElementById('toggle-link');
-
-        // Toggle between Log In and Sign Up
         toggleLink.addEventListener('click', function() {
             isSignUp = !isSignUp;
             err.style.display = 'none';
-            
             if (isSignUp) {
-                formTitle.textContent = 'Create Account';
-                nameField.style.display = 'block';
-                btn.textContent = 'Sign Up';
-                togglePrompt.textContent = 'Already have an account?';
-                toggleLink.textContent = 'Log in here';
+                formTitle.textContent = 'Create Account'; nameField.style.display = 'block'; btn.textContent = 'Sign Up'; togglePrompt.textContent = 'Already have an account?'; toggleLink.textContent = 'Log in here';
             } else {
-                formTitle.textContent = 'Log In';
-                nameField.style.display = 'none';
-                btn.textContent = 'Enter';
-                togglePrompt.textContent = 'Need an account?';
-                toggleLink.textContent = 'Sign up here';
+                formTitle.textContent = 'Log In'; nameField.style.display = 'none'; btn.textContent = 'Enter'; togglePrompt.textContent = 'Need an account?'; toggleLink.textContent = 'Sign up here';
             }
         });
-
-        // Handle the button click
         btn.addEventListener('click', async function() {
             var email = document.getElementById('email').value;
             var password = document.getElementById('password').value;
-            
-            if (!email || !password) {
-                err.textContent = 'Please enter both email and password.';
-                err.style.display = 'block';
-                return;
-            }
-
-            btn.textContent = 'Checking...';
-            err.style.display = 'none';
-
+            if (!email || !password) { err.textContent = 'Please enter both email and password.'; err.style.display = 'block'; return; }
+            btn.textContent = 'Checking...'; err.style.display = 'none';
             try {
                 if (isSignUp) {
-                    // Sign Up Flow
-                    var { data, error } = await client.auth.signUp({
-                        email: email,
-                        password: password,
-                    });
-
+                    var { data, error } = await client.auth.signUp({ email: email, password: password });
                     if (error) throw error;
-
-                    if (data.session) {
-                        window.location.href = 'confessions.html';
-                    } else {
-                        alert("Account created! You can now log in.");
-                        toggleLink.click(); 
-                        btn.textContent = 'Enter';
-                    }
+                    if (data.session) { window.location.href = 'confessions.html'; } else { alert("Account created! You can now log in."); toggleLink.click(); btn.textContent = 'Enter'; }
                 } else {
-                    // Log In Flow
-                    var { data, error } = await client.auth.signInWithPassword({
-                        email: email,
-                        password: password,
-                    });
-
+                    var { data, error } = await client.auth.signInWithPassword({ email: email, password: password });
                     if (error) throw error;
-
                     window.location.href = 'confessions.html';
                 }
             } catch (error) {
-                err.textContent = error.message || "Connection failed.";
-                err.style.display = 'block';
-                btn.textContent = isSignUp ? 'Sign Up' : 'Enter';
+                err.textContent = error.message || "Connection failed."; err.style.display = 'block'; btn.textContent = isSignUp ? 'Sign Up' : 'Enter';
             }
         });
     </script>
