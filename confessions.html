@@ -1,187 +1,288 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Confessions · Charlie's</title>
-<link rel="stylesheet" href="assets/style.css">
-<style>
-  /* Hide content until we confirm they are logged in */
-  #loading { text-align: center; padding: 40px; font-style: italic; color: var(--ash); }
-  #confessions-area { display: none; }
-  
-  .confession-card {
-    background: #FBF7F0; border-left: 4px solid var(--latte);
-    padding: 20px; margin-bottom: 16px; border-radius: 0 8px 8px 0;
-    box-shadow: 0 2px 10px rgba(62,44,35,.03);
-  }
-  .confession-date {
-    font-family: 'Courier New', monospace; font-size: 0.7rem;
-    color: var(--ash); margin-bottom: 8px; letter-spacing: 0.1em;
-  }
-  #logout-btn {
-    background: transparent; border: 1px solid var(--latte); color: var(--cocoa);
-    padding: 8px 16px; border-radius: 20px; font-family: 'Courier New', monospace;
-    font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer;
-  }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Diary &middot; Charlie's</title>
+    <link rel="stylesheet" href="assets/style.css">
+    <style>
+        /* Page-specific styles */
+        #loading {
+            text-align: center;
+            padding: 40px;
+            font-style: italic;
+            color: var(--text-secondary);
+            font-family: var(--font-body);
+        }
+        #confessions-area {
+            display: none;
+        }
+        
+        /* The animation for new confessions */
+        @keyframes slideUpFade {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-in {
+            animation: slideUpFade 0.4s ease-out forwards;
+        }
+
+        .confession-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+        }
+
+        .confession-card {
+            background: var(--bg-surface);
+            border-left: 3px solid var(--accent-brand);
+            padding: 24px;
+            margin-bottom: 16px;
+            border-radius: 0 12px 12px 0;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .confession-date {
+            font-family: var(--font-body);
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+
+        .confession-card p {
+            font-size: 1.05rem;
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .post-box {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            padding: 24px;
+            border-radius: 12px;
+            margin-bottom: 40px;
+        }
+
+        #logout-btn {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-family: var(--font-body);
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        #logout-btn:hover {
+            border-color: var(--accent-brand);
+            color: var(--accent-brand);
+        }
+    </style>
 </head>
 <body>
 
-<div class="topbar">
-  <div class="wrap">
-    <a class="brand" href="index.html">Charlie's</a>
-    <button class="hamburger" aria-label="Open menu" aria-expanded="false" aria-controls="overlay">
-      <span></span><span></span><span></span>
-    </button>
-  </div>
-</div>
-
-<nav class="overlay" id="overlay" aria-label="Main menu">
-  <a href="index.html">Home</a>
-  <a href="what-is.html">What is Charlie's Burger Joint?</a>
-  <a href="members.html">Member List</a>
-  <a href="profiles.html">Member Profiles</a>
-  <a href="calendar.html">Group Calendar</a>
-  <a href="locations.html">Locations</a>
-  <a href="contact.html">Contact Us</a>
-</nav>
-
-<header class="page-head">
-  <p class="kicker">Private Area</p>
-  <h1>The Diary</h1>
-  <p class="lead" style="margin:16px auto 0;">Anonymous thoughts, confessions, and secrets.</p>
-</header>
-
-<main>
-  <div class="wrap">
-    
-    <div id="loading">Checking your ID...</div>
-
-    <div id="confessions-area">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
-        <h2 style="margin:0; font-size:1.2rem;">Recent Entries</h2>
-        <button id="logout-btn">Log out</button>
-      </div>
-
-      <!-- Form to add a new confession -->
-      <div style="background:var(--oat); padding:20px; border-radius:10px; margin-bottom:30px;">
-        <label for="new-confession">Drop a secret (Anonymous)</label>
-        <textarea id="new-confession" placeholder="What's on your mind?..." style="margin-bottom:12px;"></textarea>
-        <button type="button" id="submit-btn" style="width:100%;">Post Confession</button>
-      </div>
-
-      <!-- List of confessions goes here -->
-      <div id="list-area">
-        <!-- JavaScript will fill this -->
-      </div>
+    <!-- Ambient Background Orbs -->
+    <div class="bg-orbs" aria-hidden="true">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
     </div>
 
-  </div>
-</main>
+    <!-- Top Navigation -->
+    <div class="topbar">
+        <div class="wrap">
+            <a class="brand" href="index.html">Charlie's</a>
+            <button class="hamburger" aria-label="Open menu" aria-expanded="false" aria-controls="overlay">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </div>
 
-<footer>
-  <div class="wrap"><p>Charlie's Burger Joint · eMzansi · Built with love and no photos</p></div>
-</footer>
+    <!-- Overlay Menu -->
+    <nav class="overlay" id="overlay" aria-label="Main menu">
+        <a href="index.html">Home</a>
+        <a href="what-is.html">What is Charlie's Burger Joint?</a>
+        <a href="members.html">Member List</a>
+        <a href="profiles.html">Member Profiles</a>
+        <a href="calendar.html">Group Calendar</a>
+        <a href="locations.html">Locations</a>
+        <a href="contact.html">Contact Us</a>
+    </nav>
 
-<script src="assets/nav.js"></script>
+    <!-- Page Header -->
+    <header class="page-head">
+        <p class="kicker">Private Area</p>
+        <h1>The Diary</h1>
+        <p class="lead" style="margin: 16px auto 0;">Anonymous thoughts, confessions, and secrets.</p>
+    </header>
 
-<!-- Load Supabase Library from unpkg -->
-<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-<script>
-  var supabaseUrl = 'https://yssyfxwvcdmqlulqsiem.supabase.co';
-  var supabaseKey = 'sb_publishable_vEBQ5ObCGj5yotPFao4CXw_mqnQyVSf';
-  var client = window.supabase.createClient(supabaseUrl, supabaseKey);
+    <!-- Main Content -->
+    <main>
+        <div class="wrap">
+            
+            <div id="loading">Checking your ID...</div>
 
-  // --- 1. CHECK IF LOGGED IN ---
-  async function checkUser() {
-    try {
-      var { data, error } = await client.auth.getUser();
-      
-      if (error || !data.user) {
-        // If no user, kick them back to login
-        window.location.href = 'login.html';
-      } else {
-        // They are logged in, show the page!
-        document.getElementById('loading').style.display = 'none';
-        document.getElementById('confessions-area').style.display = 'block';
-        loadConfessions();
-      }
-    } catch (err) {
-      document.getElementById('loading').innerHTML = '<span style="color:red;">Error: ' + err.message + '</span>';
-    }
-  }
+            <div id="confessions-area">
+                
+                <div class="confession-header">
+                    <h2 style="margin: 0; font-size: 1.4rem;">Recent Entries</h2>
+                    <button id="logout-btn">Log out</button>
+                </div>
 
-  // --- 2. LOAD CONFESSIONS ---
-  async function loadConfessions() {
-    var { data, error } = await client
-      .from('confessions')
-      .select('*')
-      .order('created_at', { ascending: false });
+                <!-- Form to add a new confession -->
+                <div class="post-box">
+                    <label for="new-confession">Drop a secret (Anonymous)</label>
+                    <textarea id="new-confession" placeholder="What's on your mind?..." style="margin-bottom: 16px;"></textarea>
+                    <button type="button" id="submit-btn">Post Confession</button>
+                </div>
 
-    var list = document.getElementById('list-area');
-    
-    if (error) {
-      list.innerHTML = '<p style="color:red;">Error loading: ' + error.message + '</p>';
-      return;
-    }
+                <!-- List of confessions goes here -->
+                <div id="list-area">
+                    <!-- JavaScript will fill this -->
+                </div>
 
-    if (data.length === 0) {
-      list.innerHTML = '<p style="font-style:italic; color:var(--ash);">No secrets yet. Be the first.</p>';
-      return;
-    }
+            </div>
 
-    var htmlString = '';
-    for (var i = 0; i < data.length; i++) {
-      var item = data[i];
-      var dateStr = new Date(item.created_at).toLocaleDateString();
-      htmlString += '<div class="confession-card">';
-      htmlString += '<div class="confession-date">' + dateStr + '</div>';
-      htmlString += '<p>' + item.content + '</p>';
-      htmlString += '</div>';
-    }
-    list.innerHTML = htmlString;
-  }
+        </div>
+    </main>
 
-  // --- 3. POST A NEW CONFESSION ---
-  document.getElementById('submit-btn').addEventListener('click', async () => {
-    var text = document.getElementById('new-confession').value;
-    if (!text) return;
+    <!-- Footer -->
+    <footer>
+        <div class="wrap">
+            <p>Developed by Nova, 2026</p>
+        </div>
+    </footer>
 
-    var btn = document.getElementById('submit-btn');
-    btn.textContent = 'Posting...';
+    <script src="assets/nav.js"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script>
+        var supabaseUrl = 'https://yssyfxwvcdmqlulqsiem.supabase.co';
+        var supabaseKey = 'sb_publishable_vEBQ5ObCGj5yotPFao4CXw_mqnQyVSf';
+        var client = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-    var userResponse = await client.auth.getUser();
-    if (!userResponse.data.user) {
-      alert("You got logged out. Please log in again.");
-      window.location.href = 'login.html';
-      return;
-    }
+        // --- 1. CHECK IF LOGGED IN ---
+        async function checkUser() {
+            try {
+                var { data, error } = await client.auth.getUser();
+                
+                if (error || !data.user) {
+                    window.location.href = 'login.html';
+                } else {
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('confessions-area').style.display = 'block';
+                    loadConfessions();
+                }
+            } catch (err) {
+                document.getElementById('loading').innerHTML = '<span style="color: var(--accent-brand);">Error: ' + err.message + '</span>';
+            }
+        }
 
-    var { error } = await client
-      .from('confessions')
-      .insert([
-        { content: text, user_id: userResponse.data.user.id }
-      ]);
+        // --- 2. LOAD CONFESSIONS ---
+        async function loadConfessions() {
+            var { data, error } = await client
+                .from('confessions')
+                .select('*')
+                .order('created_at', { ascending: false });
 
-    if (error) {
-      alert("Error posting: " + error.message);
-      btn.textContent = 'Post Confession';
-    } else {
-      document.getElementById('new-confession').value = '';
-      btn.textContent = 'Post Confession';
-      loadConfessions(); // Refresh the list
-    }
-  });
+            var list = document.getElementById('list-area');
+            
+            if (error) {
+                list.innerHTML = '<p style="color: var(--accent-brand);">Error loading: ' + error.message + '</p>';
+                return;
+            }
 
-  // --- 4. LOG OUT ---
-  document.getElementById('logout-btn').addEventListener('click', async () => {
-    await client.auth.signOut();
-    window.location.href = 'login.html';
-  });
+            if (data.length === 0) {
+                list.innerHTML = '<p style="font-style: italic; color: var(--text-secondary);">No secrets yet. Be the first.</p>';
+                return;
+            }
 
-  // Run the check when the page loads
-  checkUser();
-</script>
+            var htmlString = '';
+            for (var i = 0; i < data.length; i++) {
+                var item = data[i];
+                var dateStr = new Date(item.created_at).toLocaleDateString();
+                htmlString += '<div class="confession-card animate-in">';
+                htmlString += '<div class="confession-date">' + dateStr + '</div>';
+                htmlString += '<p>' + item.content + '</p>';
+                htmlString += '</div>';
+            }
+            list.innerHTML = htmlString;
+        }
+
+        // --- 3. POST A NEW CONFESSION ---
+        document.getElementById('submit-btn').addEventListener('click', async () => {
+            var text = document.getElementById('new-confession').value;
+            if (!text) return;
+
+            playSizzle();
+
+            var btn = document.getElementById('submit-btn');
+            btn.textContent = 'Posting...';
+
+            var userResponse = await client.auth.getUser();
+            if (!userResponse.data.user) {
+                alert("You got logged out. Please log in again.");
+                window.location.href = 'login.html';
+                return;
+            }
+
+            var { error } = await client
+                .from('confessions')
+                .insert([
+                    { content: text, user_id: userResponse.data.user.id }
+                ]);
+
+            if (error) {
+                alert("Error posting: " + error.message);
+                btn.textContent = 'Post Confession';
+            } else {
+                document.getElementById('new-confession').value = '';
+                btn.textContent = 'Post Confession';
+                loadConfessions();
+            }
+        });
+
+        // --- 4. LOG OUT ---
+        document.getElementById('logout-btn').addEventListener('click', async () => {
+            await client.auth.signOut();
+            window.location.href = 'login.html';
+        });
+
+        // --- 5. THE SIZZLE SOUND EFFECT ---
+        function playSizzle() {
+            try {
+                var AudioContext = window.AudioContext || window.webkitAudioContext;
+                var ctx = new AudioContext();
+                var osc = ctx.createOscillator();
+                var gain = ctx.createGain();
+                
+                osc.connect(gain); 
+                gain.connect(ctx.destination);
+                
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(600, ctx.currentTime); 
+                osc.frequency.exponentialRampToValueAtTime(150, ctx.currentTime + 0.1); 
+                
+                gain.gain.setValueAtTime(0.1, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
+                
+                osc.start(); 
+                osc.stop(ctx.currentTime + 0.1);
+            } catch(e) {
+                // Ignore if browser blocks audio
+            }
+        }
+
+        // Run the check when the page loads
+        checkUser();
+    </script>
 </body>
 </html>
