@@ -1,77 +1,91 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Contact Us · Charlie's</title>
-<link rel="stylesheet" href="assets/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us &middot; Charlie's</title>
+    <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
 
-<div class="topbar">
-  <div class="wrap">
-    <a class="brand" href="index.html">Charlie's</a>
-    <button class="hamburger" aria-label="Open menu" aria-expanded="false" aria-controls="overlay">
-      <span></span><span></span><span></span>
-    </button>
-  </div>
-</div>
-
-<nav class="overlay" id="overlay" aria-label="Main menu">
-  <a href="index.html">Home</a>
-  <a href="what-is.html">What is Charlie's Burger Joint?</a>
-  <a href="members.html">Member List</a>
-  <a href="profiles.html">Member Profiles</a>
-  <a href="calendar.html">Group Calendar</a>
-  <a href="locations.html">Locations</a>
-  <a href="contact.html" class="active">Contact Us</a>
-</nav>
-
-<header class="page-head">
-  <p class="kicker">06 — Find Us</p>
-  <h1>Contact Us</h1>
-  <p class="lead" style="margin:16px auto 0;">The diner's always open. Drop us a note, or message us directly.</p>
-</header>
-
-<main>
-<section style="border-top:none;">
-  <div class="wrap">
-    <div class="contact-grid">
-
-      <div class="whatsapp">
-        <p class="kicker">The chalkboard</p>
-        <p style="font-size:1.05rem;">Charlie's Burger Joint on WhatsApp, eMzansi</p>
-        <a href="https://chat.whatsapp.com/EF4ZxhRUJwh12N1PX7oGYJ?s=cl&p=a&iam=2" target="_blank" rel="noopener">Message us directly →</a>
-      </div>
-
-      <form action="https://formspree.io/f/mnpdworp" method="POST">
-        <h3>The order slip</h3>
-        <p class="formnote">Your details stay between us.</p>
-
-        <label for="name">Name</label>
-        <input type="text" id="name" name="name" required>
-
-        <label for="email">Email (optional)</label>
-        <input type="email" id="email" name="email">
-
-        <label for="order">What's your usual order?</label>
-        <input type="text" id="order" name="usual_order" placeholder="e.g. the Vent, extra cheese">
-
-        <label for="message">What's on your mind?</label>
-        <textarea id="message" name="message" required></textarea>
-
-        <button type="submit">Send it over</button>
-      </form>
-
+    <!-- Ambient Background Orbs -->
+    <div class="bg-orbs" aria-hidden="true">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
     </div>
-  </div>
-</section>
-</main>
 
-<footer>
-  <div class="wrap"><p>Charlie's Burger Joint · eMzansi · Built with love and no photos</p></div>
-</footer>
+    <!-- Top Navigation -->
+    <div class="topbar">
+        <div class="wrap">
+            <a class="brand" href="index.html">Charlie's</a>
+            <button class="hamburger" aria-label="Open menu" aria-expanded="false" aria-controls="overlay">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </div>
 
-<script src="assets/nav.js"></script>
+    <!-- Overlay Menu -->
+    <nav class="overlay" id="overlay" aria-label="Main menu">
+        <a href="index.html">Home</a>
+        <a href="what-is.html">What is Charlie's Burger Joint?</a>
+        <a href="members.html">Member List</a>
+        <a href="profiles.html">Member Profiles</a>
+        <a href="calendar.html">Group Calendar</a>
+        <a href="locations.html">Locations</a>
+        <a href="contact.html" class="active">Contact Us</a>
+    </nav>
+
+    <!-- Page Header -->
+    <header class="page-head">
+        <p class="kicker">06 &mdash; Find Us</p>
+        <h1>Contact Us</h1>
+        <p class="lead" style="margin: 16px auto 0;">The diner's always open. Drop us a note, or message us directly.</p>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <section style="border-top: none;">
+            <div class="wrap">
+                <div class="contact-grid">
+
+                    <div class="whatsapp">
+                        <p class="kicker">The Chalkboard</p>
+                        <p style="font-size: 1.1rem; margin-bottom: 8px;">Charlie's Burger Joint on WhatsApp, eMzansi</p>
+                        <a href="https://chat.whatsapp.com/EF4ZxhRUJwh12N1PX7oGYJ?s=cl&p=a&iam=2" target="_blank" rel="noopener">Message us directly &rarr;</a>
+                    </div>
+
+                    <form action="https://formspree.io/f/mnpdworp" method="POST">
+                        <h3>The order slip</h3>
+                        <p class="formnote">Your details stay between us.</p>
+
+                        <label for="name">Name</label>
+                        <input type="text" id="name" name="name" required placeholder="e.g. Nova">
+
+                        <label for="email">Email (optional)</label>
+                        <input type="email" id="email" name="email" placeholder="you@example.com">
+
+                        <label for="order">What's your usual order?</label>
+                        <input type="text" id="order" name="usual_order" placeholder="e.g. the Vent, extra cheese">
+
+                        <label for="message">What's on your mind?</label>
+                        <textarea id="message" name="message" required placeholder="Write your message here..."></textarea>
+
+                        <button type="submit">Send it over</button>
+                    </form>
+
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="wrap">
+            <p>Developed by Nova, 2026</p>
+        </div>
+    </footer>
+
+    <script src="assets/nav.js"></script>
 </body>
 </html>
