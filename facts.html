@@ -6,34 +6,81 @@
     <title>Did You Know? &middot; Charlie's</title>
     <link rel="stylesheet" href="assets/style.css">
     <style>
+        /* --- FIX: Stop sideways scroll --- */
+        *, *::before, *::after { box-sizing: border-box; }
+        html, body { overflow-x: hidden !important; width: 100%; }
+        .bg-orbs { overflow: hidden; position: fixed; inset: 0; pointer-events: none; }
+        .orb { max-width: 60vw; max-height: 60vw; }
+
+        /* --- FIX: The huge #DidYouKnow --- */
+        .page-head { padding: 32px 16px 20px !important; text-align: center; }
+        .page-head h1 {
+            font-size: clamp(2.5rem, 13vw, 4.5rem) !important;
+            line-height: 1 !important;
+            word-break: break-word;
+            overflow-wrap: break-word;
+            margin: 8px 0 !important;
+        }
+        .page-head .lead {
+            font-size: 1rem !important;
+            line-height: 1.5 !important;
+            max-width: 90% !important;
+            margin: 12px auto 0 !important;
+        }
+
+        /* --- FIX: Layout --- */
+        .wrap { width: 100% !important; max-width: 720px !important; padding-left: 16px !important; padding-right: 16px !important; margin: 0 auto; }
+        main { padding: 0 0 40px; }
+
         .fact-card {
             background: var(--bg-surface);
             border-left: 3px solid var(--accent-gold);
-            padding: 24px;
-            margin-bottom: 16px;
+            padding: 20px 18px;
+            margin-bottom: 14px;
             border-radius: 0 12px 12px 0;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
             animation: fadeUp 0.4s ease-out forwards;
+            width: 100%;
+            overflow-wrap: break-word;
         }
         .fact-card p {
-            font-size: 1.05rem;
+            font-size: 1rem;
             color: var(--text-primary);
             line-height: 1.6;
             margin: 0;
+            overflow-wrap: break-word;
         }
         .post-box {
             background: var(--bg-surface);
             border: 1px solid var(--border-color);
-            padding: 24px;
+            padding: 20px 16px;
             border-radius: 12px;
-            margin-bottom: 40px;
+            margin-bottom: 24px;
+            width: 100%;
         }
-        #loading {
-            text-align: center;
-            padding: 40px;
-            font-style: italic;
-            color: var(--text-secondary);
+        .post-box label { display: block; font-weight: 600; margin-bottom: 10px; }
+        #new-fact {
+            width: 100% !important;
+            min-height: 90px;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-primary, #fff);
+            color: inherit;
+            font-family: inherit;
+            font-size: 1rem;
+            resize: vertical;
+            display: block;
+            margin-bottom: 12px !important;
         }
+        #submit-btn {
+            width: 100% !important;
+            padding: 14px !important;
+            font-size: 1rem !important;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+        #loading { text-align: center; padding: 40px 16px; font-style: italic; color: var(--text-secondary); }
     </style>
 </head>
 <body>
@@ -67,29 +114,20 @@
     <header class="page-head">
         <p class="kicker">The Bulletin Board</p>
         <h1>#DidYouKnow</h1>
-        <p class="lead" style="margin: 16px auto 0;">Random facts, weird trivia, and things we just learned.</p>
+        <p class="lead">Random facts, weird trivia, and things we just learned.</p>
     </header>
 
     <main>
         <div class="wrap">
-            
             <div id="loading">Loading facts...</div>
-
             <div id="facts-area" style="display: none;">
-                
-                <!-- Form to add a new fact (No login required) -->
                 <div class="post-box">
                     <label for="new-fact">Drop a random fact</label>
-                    <textarea id="new-fact" placeholder="e.g. Honey never spoils..." style="margin-bottom: 16px;"></textarea>
+                    <textarea id="new-fact" placeholder="e.g. Honey never spoils..."></textarea>
                     <button type="button" id="submit-btn">Post Fact</button>
                 </div>
-
-                <div id="list-area">
-                    <!-- JavaScript will fill this -->
-                </div>
-
+                <div id="list-area"></div>
             </div>
-
         </div>
     </main>
 
@@ -106,27 +144,13 @@
         var supabaseKey = 'sb_publishable_vEBQ5ObCGj5yotPFao4CXw_mqnQyVSf';
         var client = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-        // --- 1. LOAD FACTS ---
         async function loadFacts() {
-            var { data, error } = await client
-                .from('facts')
-                .select('*')
-                .order('created_at', { ascending: false });
-
+            var { data, error } = await client.from('facts').select('*').order('created_at', { ascending: false });
             var list = document.getElementById('list-area');
             document.getElementById('loading').style.display = 'none';
             document.getElementById('facts-area').style.display = 'block';
-
-            if (error) {
-                list.innerHTML = '<p style="color: var(--accent-brand);">Error loading: ' + error.message + '</p>';
-                return;
-            }
-
-            if (data.length === 0) {
-                list.innerHTML = '<p style="font-style: italic; color: var(--text-secondary);">No facts yet. Be the first to teach us something.</p>';
-                return;
-            }
-
+            if (error) { list.innerHTML = '<p style="color: var(--accent-brand);">Error loading: ' + error.message + '</p>'; return; }
+            if (data.length === 0) { list.innerHTML = '<p style="font-style: italic; color: var(--text-secondary);">No facts yet. Be the first to teach us something.</p>'; return; }
             var htmlString = '';
             for (var i = 0; i < data.length; i++) {
                 var item = data[i];
@@ -135,29 +159,15 @@
             list.innerHTML = htmlString;
         }
 
-        // --- 2. POST A NEW FACT ---
         document.getElementById('submit-btn').addEventListener('click', async () => {
-            var text = document.getElementById('new-fact').value;
+            var text = document.getElementById('new-fact').value.trim();
             if (!text) return;
-
             var btn = document.getElementById('submit-btn');
             btn.textContent = 'Posting...';
-
-            var { error } = await client
-                .from('facts')
-                .insert([ { content: text } ]);
-
-            if (error) {
-                alert("Error posting: " + error.message);
-                btn.textContent = 'Post Fact';
-            } else {
-                document.getElementById('new-fact').value = '';
-                btn.textContent = 'Post Fact';
-                loadFacts(); // Refresh the list
-            }
+            var { error } = await client.from('facts').insert([ { content: text } ]);
+            if (error) { alert("Error posting: " + error.message); btn.textContent = 'Post Fact'; }
+            else { document.getElementById('new-fact').value = ''; btn.textContent = 'Post Fact'; loadFacts(); }
         });
-
-        // Start loading
         loadFacts();
     </script>
 </body>
